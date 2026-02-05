@@ -368,18 +368,28 @@ function App() {
                 </motion.button>
               ))}
               
-              {/* Language Toggle */}
-              <div className="royal-toggle flex">
+              {/* Premium Language Toggle with Real Images */}
+              <div className={`flex items-center p-1 rounded-full border transition-colors duration-300 ${theme === 'dark' ? 'bg-white/5 border-white/10' : 'bg-slate-100 border-slate-200'}`}>
                 <button
                   onClick={() => setLang('en')}
-                  className={`toggle-button ${lang === 'en' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all duration-300 ${
+                    lang === 'en' 
+                      ? 'bg-[#3b82f6] text-white shadow-lg scale-105' 
+                      : (theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900')
+                  }`}
                 >
+                  <img src="https://flagcdn.com/w40/us.png" alt="US" className="w-4 h-3 object-cover rounded-[2px]" />
                   EN
                 </button>
                 <button
                   onClick={() => setLang('tr')}
-                  className={`toggle-button ${lang === 'tr' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all duration-300 ${
+                    lang === 'tr' 
+                      ? 'bg-[#3b82f6] text-white shadow-lg scale-105' 
+                      : (theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-900')
+                  }`}
                 >
+                  <img src="https://flagcdn.com/w40/tr.png" alt="TR" className="w-4 h-3 object-cover rounded-[2px]" />
                   TR
                 </button>
               </div>
@@ -452,18 +462,29 @@ function App() {
                   </motion.button>
                 ))}
                 
-                <div className="royal-toggle flex w-full mt-4">
+                {/* Mobile Language Toggle with Real Images */}
+                <div className={`flex w-full mt-6 p-1 rounded-xl ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'}`}>
                   <button
                     onClick={() => setLang('en')}
-                    className={`toggle-button flex-1 ${lang === 'en' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
+                    className={`flex-1 flex justify-center items-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${
+                      lang === 'en' 
+                        ? 'bg-[#3b82f6] text-white shadow-md' 
+                        : (theme === 'dark' ? 'text-slate-400' : 'text-slate-500')
+                    }`}
                   >
-                    EN
+                    <img src="https://flagcdn.com/w40/us.png" alt="US" className="w-5 h-auto rounded-[2px]" />
+                    English
                   </button>
                   <button
                     onClick={() => setLang('tr')}
-                    className={`toggle-button flex-1 ${lang === 'tr' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
+                    className={`flex-1 flex justify-center items-center gap-2 py-3 rounded-lg text-sm font-bold transition-all ${
+                      lang === 'tr' 
+                        ? 'bg-[#3b82f6] text-white shadow-md' 
+                        : (theme === 'dark' ? 'text-slate-400' : 'text-slate-500')
+                    }`}
                   >
-                    TR
+                    <img src="https://flagcdn.com/w40/tr.png" alt="TR" className="w-5 h-auto rounded-[2px]" />
+                    Türkçe
                   </button>
                 </div>
               </div>
