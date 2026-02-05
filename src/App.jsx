@@ -340,7 +340,7 @@ function App() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="fixed top-0 left-0 right-0 z-50 royal-navbar"
+        className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b ${theme === 'dark' ? 'bg-[#0f172a]/90 border-white/10' : 'bg-white/90 border-slate-200'}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
@@ -473,87 +473,79 @@ function App() {
       </motion.nav>
 
       {/* HERO */}
-      <section className="min-h-screen flex items-center justify-center pt-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden section-hero">
-        {/* Animated background gradient orbs */}
+      <section className="min-h-screen flex items-center justify-center pt-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+        {/* Animated background - Adjusted for light mode visibility */}
         <motion.div
-          className="absolute top-20 left-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          className={`absolute top-20 left-10 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl ${theme === 'dark' ? 'bg-blue-500 opacity-20' : 'bg-blue-300 opacity-40'}`}
           animate={{
             scale: [1, 1.2, 1],
             x: [0, 50, 0],
             y: [0, 30, 0],
           }}
-          transition={{
-            duration: 8,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          className={`absolute bottom-20 right-10 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl ${theme === 'dark' ? 'bg-purple-500 opacity-20' : 'bg-purple-300 opacity-40'}`}
           animate={{
             scale: [1.2, 1, 1.2],
             x: [0, -50, 0],
             y: [0, -30, 0],
           }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
 
         <motion.div 
           className="max-w-6xl mx-auto text-center relative z-10"
           style={{ y: y1, opacity }}
         >
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-          >
+          <motion.div initial="hidden" animate="visible" variants={staggerContainer}>
+            {/* HEADLINE FIX: Added 'mr-3' for spacing and theme colors */}
             <motion.h1 
               variants={fadeUp}
-              className="text-5xl sm:text-7xl lg:text-8xl font-black mb-8 hero-headline font-serif leading-tight"
+              className="text-5xl sm:text-7xl lg:text-8xl font-black mb-8 font-serif leading-tight"
             >
               {t.hero.headline.split(' ').map((word, i) => (
                 <motion.span
                   key={i}
-                  className="inline-block"
+                  className="inline-block mr-3 sm:mr-4 last:mr-0"
+                  // ⚡ FORCE COLOR UPDATE via Framer Motion
+                  animate={{ 
+                    color: theme === 'dark' ? '#ffffff' : '#0f172a' 
+                  }}
+                  transition={{ duration: 0.3 }}
                   whileHover={{ 
-                    scale: 1.05,
+                    scale: 1.05, 
                     color: '#3b82f6',
                     transition: { duration: 0.2 }
                   }}
                 >
-                  {word}{' '}
+                  {word}
                 </motion.span>
               ))}
             </motion.h1>
 
+            {/* SUBHEADLINE FIX: Added theme colors */}
             <motion.p 
               variants={fadeUp}
-              className="text-xl sm:text-2xl lg:text-3xl hero-subheadline max-w-4xl mx-auto mb-12 leading-relaxed"
+              className={`text-xl sm:text-2xl lg:text-3xl max-w-4xl mx-auto mb-12 leading-relaxed ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}
             >
               {t.hero.subheadline}
             </motion.p>
 
-            <motion.div 
-              variants={fadeUp}
-              className="flex flex-col sm:flex-row gap-6 justify-center"
-            >
+            <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-6 justify-center">
               <motion.button
                 onClick={() => scrollToSection('demo')}
-                className="royal-button-primary px-10 py-5 rounded-full inline-flex items-center space-x-3 text-lg"
+                className="bg-[#3b82f6] text-white px-10 py-5 rounded-full inline-flex items-center space-x-3 text-lg font-bold hover:bg-blue-600 transition shadow-lg hover:shadow-blue-500/30"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Play className="w-6 h-6" />
+                <Play className="w-6 h-6 fill-current" />
                 <span>{t.hero.ctaDemo}</span>
               </motion.button>
 
               <motion.button
                 onClick={() => scrollToSection('contact')}
-                className="royal-button-secondary px-10 py-5 rounded-full inline-flex items-center space-x-3 text-lg"
+                className={`border px-10 py-5 rounded-full inline-flex items-center space-x-3 text-lg font-bold transition ${theme === 'dark' ? 'border-white/20 hover:bg-white/10 text-white' : 'border-slate-300 hover:bg-slate-100 text-[#0f172a]'}`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -562,27 +554,6 @@ function App() {
               </motion.button>
             </motion.div>
           </motion.div>
-
-          {/* Floating particles */}
-          {[...Array(6)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-blue-500 rounded-full opacity-40"
-              style={{
-                top: `${Math.random() * 100}%`,
-                left: `${Math.random() * 100}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.4, 0.8, 0.4],
-              }}
-              transition={{
-                duration: 3 + Math.random() * 2,
-                repeat: Infinity,
-                delay: Math.random() * 2,
-              }}
-            />
-          ))}
         </motion.div>
       </section>
 
