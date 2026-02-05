@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { 
   Anchor, Menu, X, ArrowRight, MessageCircle, Play, Smartphone,
   Monitor, Check, Download, ExternalLink, Database, Zap, 
   Lock, Server, Mail, Phone as PhoneIcon, MapPin, CreditCard,
   Users, Building2, Ship, Clock, Bell, Calendar, DollarSign,
-  Shield, BarChart3, Wifi, Sun, Moon, Github, Twitter, Linkedin,
-  Instagram, Facebook
+  Shield, BarChart3, Wifi, Sun, Moon, Linkedin, Globe,
+  Instagram, Briefcase, Sparkles
 } from 'lucide-react';
 
 /* STATIC ASSETS */
@@ -30,7 +30,7 @@ const techStack = [
 /* CONTENT DICTIONARY */
 const content = {
   tr: {
-    nav: { features: 'Özellikler', demo: 'Demo', contact: 'İletişim', whoWeServe: 'Kimler İçin' },
+    nav: { features: 'Özellikler', demo: 'Demo', contact: 'İletişim', whoWeServe: 'Kimler İçin', portfolio: 'Portföy' },
     hero: {
       headline: 'Yat İşletmenizi Otopilota Alın.',
       subheadline: "Excel ile boğuşmayı bırakın. WhatsApp üzerinden ödeme toplayan, takviminizi güncelleyen ve hatırlatmaları yöneten tam otomatik sistem.",
@@ -134,17 +134,22 @@ const content = {
     footer: {
       brand: 'YachtMaster',
       tagline: 'Lüks tekne yönetiminde yeni standart.',
+      quickLinks: 'Hızlı Bağlantılar',
+      portfolio: 'Proje Portföyümüz',
+      website: 'AppSheet Solutions',
       contact: {
         title: 'İletişim'
       },
       email: 'erkinjonovsamandar2@gmail.com',
       phone: '+90 551 520 95 56',
       whatsapp: '+998337323505',
+      social: 'Sosyal Medya',
+      instagramComing: 'Yakında',
       rights: '© 2026 YachtMaster. Tüm hakları saklıdır.'
     }
   },
   en: {
-    nav: { features: 'Features', demo: 'Demo', contact: 'Contact', whoWeServe: 'Who We Serve' },
+    nav: { features: 'Features', demo: 'Demo', contact: 'Contact', whoWeServe: 'Who We Serve', portfolio: 'Portfolio' },
     hero: {
       headline: 'Put Your Yacht Business on Autopilot.',
       subheadline: "Stop wrestling with Excel. A fully automated system that collects payments via WhatsApp, updates your calendar, and handles reminders.",
@@ -199,17 +204,17 @@ const content = {
         {
           icon: 'Shield',
           title: 'Secure Infrastructure',
-          description: 'Hosted on Google Cloud. Your data is encrypted, backed up, and protected.'
+          description: 'Built on Google Cloud. Your data is encrypted, backed up, and protected.'
         },
         {
           icon: 'Wifi',
           title: 'Access Anywhere',
-          description: 'Mobile, tablet, desktop. Works in sync across all your devices.'
+          description: 'Mobile, tablet, desktop. Works seamlessly across all your devices.'
         }
       ]
     },
     experience: {
-      title: 'The Digital Experience',
+      title: 'Digital Experience',
       desktop: 'Desktop View',
       mobile: 'Mobile View'
     },
@@ -217,10 +222,10 @@ const content = {
       title: 'Manager Pro Workflow',
       subtitle: 'Complete automation cycle',
       steps: [
-        { title: '1. Booking Entry', desc: 'Captain enters booking details in AppSheet.' },
-        { title: '2. Auto-Payment', desc: 'System instantly sends an Iyzico payment link to client via WhatsApp.' },
-        { title: '3. Sync & Confirm', desc: 'Once paid, Google Calendar creates event and sends confirmation ticket.' },
-        { title: '4. Lifecycle', desc: 'System sends location on trip day + upsell offers 2h before + feedback link after.' }
+        { title: '1. Booking Entry', desc: 'Captain enters reservation details into AppSheet.' },
+        { title: '2. Automatic Payment', desc: 'System instantly sends Iyzico payment link via WhatsApp to customer.' },
+        { title: '3. Sync & Confirmation', desc: 'After payment received, creates Google Calendar event and sends confirmation ticket.' },
+        { title: '4. Lifecycle', desc: 'System sends location on tour day + upsell offers 2 hours before + feedback link after tour.' }
       ]
     },
     offers: {
@@ -231,8 +236,8 @@ const content = {
         name: 'Core System',
         price: '$388',
         originalPrice: '$554',
-        badge: 'Digital Logbook & 48h Setup',
-        features: ['WhatsApp → Calendar Sync', 'Reservation Management', 'Google Cloud Infrastructure', '2 Weeks Support']
+        badge: 'Digital Logbook & 48hr Setup',
+        features: ['WhatsApp → Calendar Integration', 'Booking Management', 'Google Cloud Infrastructure', '2 Weeks Support']
       },
       manager: {
         name: 'Manager Pro',
@@ -244,34 +249,49 @@ const content = {
       viewWorkflow: 'View Workflow',
       hideWorkflow: 'Hide Workflow'
     },
-    tech: { title: 'Powered By' },
+    tech: { title: 'Powerful Infrastructure' },
     footer: {
       brand: 'YachtMaster',
-      tagline: 'The new standard in luxury yacht management.',
+      tagline: 'The new standard in luxury boat management.',
+      quickLinks: 'Quick Links',
+      portfolio: 'Our Portfolio',
+      website: 'AppSheet Solutions',
       contact: {
         title: 'Contact'
       },
       email: 'erkinjonovsamandar2@gmail.com',
       phone: '+90 551 520 95 56',
       whatsapp: '+998337323505',
+      social: 'Social Media',
+      instagramComing: 'Coming Soon',
       rights: '© 2026 YachtMaster. All rights reserved.'
     }
   }
 };
 
+const iconMap = {
+  Ship, Building2, Users, Zap, Calendar, Bell, BarChart3, Shield, Wifi
+};
+
 function App() {
-  const [lang, setLang] = useState('tr');
-  const [theme, setTheme] = useState('light');
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [lang, setLang] = useState('en');
+  const [theme, setTheme] = useState('dark');
+  const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('desktop');
+  const [currentScreen, setCurrentScreen] = useState(0);
   const [showWorkflow, setShowWorkflow] = useState(false);
 
   const t = content[lang];
 
+  // Parallax scroll effect
+  const { scrollYProgress } = useScroll();
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, -200]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % mobileScreens.length);
+      setCurrentScreen((prev) => (prev + 1) % mobileScreens.length);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -281,7 +301,7 @@ function App() {
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+      transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
     }
   };
 
@@ -289,130 +309,162 @@ function App() {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: { staggerChildren: 0.15, delayChildren: 0.1 }
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1
+      }
     }
   };
 
-  const slideVariants = {
-    enter: { x: '100%', opacity: 0 },
-    center: { x: 0, opacity: 1 },
-    exit: { x: '-100%', opacity: 0 }
+  const scaleIn = {
+    hidden: { scale: 0.8, opacity: 0 },
+    visible: { 
+      scale: 1, 
+      opacity: 1,
+      transition: { duration: 0.5, ease: 'easeOut' }
+    }
   };
 
-  const iconComponents = {
-    Ship,
-    Building2,
-    Users,
-    Zap,
-    Calendar,
-    Bell,
-    BarChart3,
-    Shield,
-    Wifi
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setMenuOpen(false);
+    }
   };
 
   return (
-    <div className={`min-h-screen overflow-x-hidden ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
+    <div className={`min-h-screen ${theme === 'dark' ? 'theme-dark' : 'theme-light'}`}>
       {/* NAVBAR */}
-      <motion.nav 
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6 }}
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
         className="fixed top-0 left-0 right-0 z-50 royal-navbar"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
+          <div className="flex items-center justify-between h-20">
+            {/* Logo */}
             <motion.div 
-              className="flex items-center space-x-3"
+              className="flex items-center space-x-3 cursor-pointer"
               whileHover={{ scale: 1.05 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             >
               <Anchor className="w-8 h-8 text-[#3b82f6] vivid-icon vivid-icon-blue" />
               <span className="text-2xl font-bold nav-brand font-serif">YachtMaster</span>
             </motion.div>
 
+            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#who-we-serve" className="font-semibold nav-link hover:text-[#3b82f6] transition">{t.nav.whoWeServe}</a>
-              <a href="#features" className="font-semibold nav-link hover:text-[#3b82f6] transition">{t.nav.features}</a>
-              <a href="#demo" className="font-semibold nav-link hover:text-[#3b82f6] transition">{t.nav.demo}</a>
-              <a href="#contact" className="font-semibold nav-link hover:text-[#3b82f6] transition">{t.nav.contact}</a>
-              
-              {/* Theme Toggle */}
-              <button
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-lg hover:bg-opacity-10 hover:bg-white transition"
-              >
-                {theme === 'dark' ? (
-                  <Sun className="w-5 h-5 text-[#f59e0b]" />
-                ) : (
-                  <Moon className="w-5 h-5 text-[#3b82f6]" />
-                )}
-              </button>
-
-              <div className="royal-toggle">
-                <button
-                  onClick={() => setLang('tr')}
-                  className={`toggle-button ${lang === 'tr' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
+              {['whoWeServe', 'features', 'demo', 'contact', 'portfolio'].map((section) => (
+                <motion.button
+                  key={section}
+                  onClick={() => scrollToSection(section)}
+                  className="nav-link hover:text-[#3b82f6] transition font-medium"
+                  whileHover={{ y: -2 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  TR
-                </button>
+                  {t.nav[section]}
+                </motion.button>
+              ))}
+              
+              {/* Language Toggle */}
+              <div className="royal-toggle flex">
                 <button
                   onClick={() => setLang('en')}
                   className={`toggle-button ${lang === 'en' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
                 >
                   EN
                 </button>
+                <button
+                  onClick={() => setLang('tr')}
+                  className={`toggle-button ${lang === 'tr' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
+                >
+                  TR
+                </button>
               </div>
+
+              {/* Theme Toggle */}
+              <motion.button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-lg hover:bg-[#3b82f6] hover:bg-opacity-20 transition"
+                whileHover={{ scale: 1.1, rotate: 180 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5 text-yellow-400" />
+                ) : (
+                  <Moon className="w-5 h-5 text-blue-600" />
+                )}
+              </motion.button>
             </div>
 
-            <button 
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden nav-link"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center space-x-3">
+              {/* Mobile Theme Toggle */}
+              <motion.button
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="p-2 rounded-lg hover:bg-[#3b82f6] hover:bg-opacity-20 transition"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                {theme === 'dark' ? (
+                  <Sun className="w-5 h-5 text-yellow-400" />
+                ) : (
+                  <Moon className="w-5 h-5 text-blue-600" />
+                )}
+              </motion.button>
+
+              <motion.button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="p-2"
+                whileTap={{ scale: 0.9 }}
+              >
+                {menuOpen ? (
+                  <X className="w-6 h-6 nav-link" />
+                ) : (
+                  <Menu className="w-6 h-6 nav-link" />
+                )}
+              </motion.button>
+            </div>
           </div>
         </div>
 
+        {/* Mobile Menu */}
         <AnimatePresence>
-          {mobileMenuOpen && (
+          {menuOpen && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="md:hidden mobile-menu"
+              transition={{ duration: 0.3 }}
+              className="md:hidden mobile-menu border-t border-[#3b82f6] border-opacity-20"
             >
               <div className="px-4 py-6 space-y-4">
-                <a href="#who-we-serve" className="block font-semibold nav-link hover:text-[#3b82f6]" onClick={() => setMobileMenuOpen(false)}>{t.nav.whoWeServe}</a>
-                <a href="#features" className="block font-semibold nav-link hover:text-[#3b82f6]" onClick={() => setMobileMenuOpen(false)}>{t.nav.features}</a>
-                <a href="#demo" className="block font-semibold nav-link hover:text-[#3b82f6]" onClick={() => setMobileMenuOpen(false)}>{t.nav.demo}</a>
-                <a href="#contact" className="block font-semibold nav-link hover:text-[#3b82f6]" onClick={() => setMobileMenuOpen(false)}>{t.nav.contact}</a>
-                
-                <div className="flex items-center space-x-4 pt-4 border-t border-slate-700">
-                  <button
-                    onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                    className="p-2 rounded-lg hover:bg-opacity-10 hover:bg-white transition"
+                {['whoWeServe', 'features', 'demo', 'contact', 'portfolio'].map((section) => (
+                  <motion.button
+                    key={section}
+                    onClick={() => scrollToSection(section)}
+                    className="block w-full text-left nav-link hover:text-[#3b82f6] transition py-2 font-medium"
+                    whileHover={{ x: 4 }}
                   >
-                    {theme === 'dark' ? (
-                      <Sun className="w-5 h-5 text-[#f59e0b]" />
-                    ) : (
-                      <Moon className="w-5 h-5 text-[#3b82f6]" />
-                    )}
+                    {t.nav[section]}
+                  </motion.button>
+                ))}
+                
+                <div className="royal-toggle flex w-full mt-4">
+                  <button
+                    onClick={() => setLang('en')}
+                    className={`toggle-button flex-1 ${lang === 'en' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
+                  >
+                    EN
                   </button>
-                  
-                  <div className="royal-toggle">
-                    <button
-                      onClick={() => setLang('tr')}
-                      className={`toggle-button ${lang === 'tr' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
-                    >
-                      TR
-                    </button>
-                    <button
-                      onClick={() => setLang('en')}
-                      className={`toggle-button ${lang === 'en' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
-                    >
-                      EN
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => setLang('tr')}
+                    className={`toggle-button flex-1 ${lang === 'tr' ? 'toggle-button-active' : 'toggle-button-inactive'}`}
+                  >
+                    TR
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -420,59 +472,122 @@ function App() {
         </AnimatePresence>
       </motion.nav>
 
-      {/* HERO SECTION */}
-      <section className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 section-hero">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
-            >
-              <motion.h1 
-                variants={fadeUp}
-                className="text-5xl sm:text-7xl lg:text-8xl font-bold mb-8 hero-headline font-serif leading-tight"
-              >
-                {t.hero.headline}
-              </motion.h1>
-              <motion.p 
-                variants={fadeUp}
-                className="text-xl sm:text-2xl hero-subheadline max-w-4xl mx-auto mb-12 leading-relaxed"
-              >
-                {t.hero.subheadline}
-              </motion.p>
-              <motion.div 
-                variants={fadeUp}
-                className="flex flex-col sm:flex-row gap-6 justify-center"
-              >
-                <a 
-                  href="#demo"
-                  className="royal-button-primary px-10 py-5 rounded-full inline-flex items-center justify-center space-x-3 text-lg"
-                >
-                  <Play className="w-6 h-6" />
-                  <span>{t.hero.ctaDemo}</span>
-                </a>
-                <a 
-                  href="#contact"
-                  className="royal-button-secondary px-10 py-5 rounded-full inline-flex items-center justify-center space-x-3 text-lg"
-                >
-                  <MessageCircle className="w-6 h-6" />
-                  <span>{t.hero.ctaContact}</span>
-                </a>
-              </motion.div>
-            </motion.div>
-          </div>
-        </div>
+      {/* HERO */}
+      <section className="min-h-screen flex items-center justify-center pt-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden section-hero">
+        {/* Animated background gradient orbs */}
+        <motion.div
+          className="absolute top-20 left-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          animate={{
+            scale: [1, 1.2, 1],
+            x: [0, 50, 0],
+            y: [0, 30, 0],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            x: [0, -50, 0],
+            y: [0, -30, 0],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        />
 
-        <div className="wave-divider-bottom">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="wave-fill"/>
-          </svg>
-        </div>
+        <motion.div 
+          className="max-w-6xl mx-auto text-center relative z-10"
+          style={{ y: y1, opacity }}
+        >
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >
+            <motion.h1 
+              variants={fadeUp}
+              className="text-5xl sm:text-7xl lg:text-8xl font-black mb-8 hero-headline font-serif leading-tight"
+            >
+              {t.hero.headline.split(' ').map((word, i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block"
+                  whileHover={{ 
+                    scale: 1.05,
+                    color: '#3b82f6',
+                    transition: { duration: 0.2 }
+                  }}
+                >
+                  {word}{' '}
+                </motion.span>
+              ))}
+            </motion.h1>
+
+            <motion.p 
+              variants={fadeUp}
+              className="text-xl sm:text-2xl lg:text-3xl hero-subheadline max-w-4xl mx-auto mb-12 leading-relaxed"
+            >
+              {t.hero.subheadline}
+            </motion.p>
+
+            <motion.div 
+              variants={fadeUp}
+              className="flex flex-col sm:flex-row gap-6 justify-center"
+            >
+              <motion.button
+                onClick={() => scrollToSection('demo')}
+                className="royal-button-primary px-10 py-5 rounded-full inline-flex items-center space-x-3 text-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Play className="w-6 h-6" />
+                <span>{t.hero.ctaDemo}</span>
+              </motion.button>
+
+              <motion.button
+                onClick={() => scrollToSection('contact')}
+                className="royal-button-secondary px-10 py-5 rounded-full inline-flex items-center space-x-3 text-lg"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <MessageCircle className="w-6 h-6" />
+                <span>{t.hero.ctaContact}</span>
+              </motion.button>
+            </motion.div>
+          </motion.div>
+
+          {/* Floating particles */}
+          {[...Array(6)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-blue-500 rounded-full opacity-40"
+              style={{
+                top: `${Math.random() * 100}%`,
+                left: `${Math.random() * 100}%`,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.4, 0.8, 0.4],
+              }}
+              transition={{
+                duration: 3 + Math.random() * 2,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+              }}
+            />
+          ))}
+        </motion.div>
       </section>
 
-      {/* WHO WE SERVE SECTION */}
-      <section id="who-we-serve" className="py-32 px-4 sm:px-6 lg:px-8 relative section-who-serve">
+      {/* WHO WE SERVE */}
+      <section id="whoWeServe" className="py-32 px-4 sm:px-6 lg:px-8 relative section-who-serve">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
@@ -481,12 +596,16 @@ function App() {
             variants={fadeUp}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl sm:text-6xl font-bold mb-6 section-title font-serif">
-              {t.whoWeServe.title}
-            </h2>
-            <p className="text-xl section-subtitle max-w-3xl mx-auto">
-              {t.whoWeServe.subtitle}
-            </p>
+            <motion.div
+              className="inline-flex items-center space-x-2 mb-4"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Sparkles className="w-6 h-6 text-[#3b82f6]" />
+              <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold section-title font-serif">
+                {t.whoWeServe.title}
+              </h2>
+            </motion.div>
+            <p className="text-xl sm:text-2xl section-subtitle mt-6">{t.whoWeServe.subtitle}</p>
           </motion.div>
 
           <motion.div
@@ -497,17 +616,24 @@ function App() {
             className="grid md:grid-cols-3 gap-8"
           >
             {t.whoWeServe.audiences.map((audience, i) => {
-              const IconComponent = iconComponents[audience.icon];
+              const Icon = iconMap[audience.icon];
               return (
                 <motion.div
                   key={i}
-                  variants={fadeUp}
-                  className="who-serve-card p-10 rounded-3xl text-center"
+                  variants={scaleIn}
+                  whileHover={{ 
+                    y: -12,
+                    transition: { duration: 0.3 }
+                  }}
+                  className="who-serve-card p-10 rounded-3xl cursor-pointer"
                 >
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-[#3b82f6] to-[#2563eb] mb-6">
-                    <IconComponent className="w-10 h-10 text-white" />
-                  </div>
-                  <h3 className="text-2xl font-bold mb-4 card-title font-serif">{audience.title}</h3>
+                  <motion.div
+                    whileHover={{ rotate: [0, -10, 10, -10, 0] }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Icon className="w-16 h-16 mb-6 vivid-icon vivid-icon-blue" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold mb-4 card-title">{audience.title}</h3>
                   <p className="card-description leading-relaxed">{audience.description}</p>
                 </motion.div>
               );
@@ -516,15 +642,9 @@ function App() {
         </div>
       </section>
 
-      {/* FEATURES SECTION */}
+      {/* FEATURES */}
       <section id="features" className="py-32 px-4 sm:px-6 lg:px-8 relative section-features">
-        <div className="wave-divider-top">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="wave-fill"/>
-          </svg>
-        </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
+        <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -532,50 +652,47 @@ function App() {
             variants={fadeUp}
             className="text-center mb-20"
           >
-            <h2 className="text-4xl sm:text-6xl font-bold mb-6 section-title font-serif">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 section-title font-serif">
               {t.features.title}
             </h2>
-            <p className="text-xl section-subtitle max-w-3xl mx-auto">
-              {t.features.subtitle}
-            </p>
+            <p className="text-xl sm:text-2xl section-subtitle">{t.features.subtitle}</p>
           </motion.div>
 
           <motion.div
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
+            viewport={{ once: true, amount: 0.1 }}
             variants={staggerContainer}
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
           >
             {t.features.items.map((feature, i) => {
-              const IconComponent = iconComponents[feature.icon];
+              const Icon = iconMap[feature.icon];
               return (
                 <motion.div
                   key={i}
                   variants={fadeUp}
-                  className="glass-ultra p-8 rounded-2xl"
+                  whileHover={{ 
+                    scale: 1.03,
+                    transition: { duration: 0.2 }
+                  }}
+                  className="glass-ultra p-10 rounded-3xl group cursor-pointer"
                 >
-                  <IconComponent className={`w-12 h-12 mb-6 vivid-icon ${
-                    i % 4 === 0 ? 'vivid-icon-blue' :
-                    i % 4 === 1 ? 'vivid-icon-green' :
-                    i % 4 === 2 ? 'vivid-icon-purple' : 'vivid-icon-gold'
-                  }`} />
-                  <h3 className="text-xl font-bold mb-3 card-title font-serif">{feature.title}</h3>
+                  <motion.div
+                    whileHover={{ scale: 1.1, rotate: 5 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Icon className="w-14 h-14 mb-6 vivid-icon vivid-icon-blue group-hover:vivid-icon-purple transition-all" />
+                  </motion.div>
+                  <h3 className="text-2xl font-bold mb-4 card-title">{feature.title}</h3>
                   <p className="card-description leading-relaxed">{feature.description}</p>
                 </motion.div>
               );
             })}
           </motion.div>
         </div>
-
-        <div className="wave-divider-bottom">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="wave-fill"/>
-          </svg>
-        </div>
       </section>
 
-      {/* DEMO SECTION */}
+      {/* DEMO EXPERIENCE */}
       <section id="demo" className="py-32 px-4 sm:px-6 lg:px-8 relative section-demo">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -585,60 +702,68 @@ function App() {
             variants={fadeUp}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl sm:text-6xl font-bold mb-6 section-title font-serif">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 section-title font-serif">
               {t.experience.title}
             </h2>
           </motion.div>
 
-          <div className="flex justify-center mb-12">
-            <div className="inline-flex rounded-2xl p-2 tab-container">
+          <motion.div 
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeUp}
+            className="mb-12"
+          >
+            <div className="tab-container flex justify-center rounded-2xl p-2 max-w-md mx-auto">
               <button
                 onClick={() => setActiveTab('desktop')}
-                className={`tab-button ${activeTab === 'desktop' ? 'tab-button-active' : 'tab-button-inactive'}`}
+                className={`tab-button flex-1 flex items-center justify-center space-x-2 ${
+                  activeTab === 'desktop' ? 'tab-button-active' : 'tab-button-inactive'
+                }`}
               >
-                <Monitor className="w-5 h-5 inline-block mr-2" />
-                {t.experience.desktop}
+                <Monitor className="w-5 h-5" />
+                <span>{t.experience.desktop}</span>
               </button>
               <button
                 onClick={() => setActiveTab('mobile')}
-                className={`tab-button ${activeTab === 'mobile' ? 'tab-button-active' : 'tab-button-inactive'}`}
+                className={`tab-button flex-1 flex items-center justify-center space-x-2 ${
+                  activeTab === 'mobile' ? 'tab-button-active' : 'tab-button-inactive'
+                }`}
               >
-                <Smartphone className="w-5 h-5 inline-block mr-2" />
-                {t.experience.mobile}
+                <Smartphone className="w-5 h-5" />
+                <span>{t.experience.mobile}</span>
               </button>
             </div>
-          </div>
+          </motion.div>
 
           <AnimatePresence mode="wait">
-            {activeTab === 'desktop' && (
+          {activeTab === 'desktop' && (
               <motion.div
                 key="desktop"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-                className="max-w-5xl mx-auto"
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 50 }}
+                transition={{ duration: 0.4 }}
+                // Added "aspect-video" and styling here to ensure it has height
+                className="video-container max-w-5xl mx-auto aspect-video rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-black"
               >
-                <div className="video-container aspect-video">
-                  <iframe
-                    className="w-full h-full rounded-3xl"
-                    src="https://www.youtube.com/embed/EQHG6qoa3cQ"
-                    title="YachtMaster Demo"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  ></iframe>
-                </div>
+                <iframe 
+                  className="w-full h-full" 
+                  src="https://www.youtube.com/embed/EQHG6qoa3cQ" 
+                  title="Demo Video" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen 
+                />
               </motion.div>
             )}
 
             {activeTab === 'mobile' && (
               <motion.div
                 key="mobile"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -50 }}
+                transition={{ duration: 0.4 }}
                 className="flex justify-center"
               >
                 <div className="iphone-frame">
@@ -646,15 +771,13 @@ function App() {
                   <div className="iphone-screen">
                     <AnimatePresence mode="wait">
                       <motion.img
-                        key={currentSlide}
-                        src={mobileScreens[currentSlide]}
-                        alt={`Mobile Screenshot ${currentSlide + 1}`}
-                        variants={slideVariants}
-                        initial="enter"
-                        animate="center"
-                        exit="exit"
-                        transition={{ duration: 0.5 }}
-                        className="w-full h-full object-contain"
+                        key={currentScreen}
+                        src={mobileScreens[currentScreen]}
+                        alt={`Mobile Screenshot ${currentScreen + 1}`}
+                        initial={{ opacity: 0, scale: 1.1 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.9 }}
+                        transition={{ duration: 0.6 }}
                       />
                     </AnimatePresence>
                   </div>
@@ -665,165 +788,125 @@ function App() {
         </div>
       </section>
 
-      {/* WORKFLOW SECTION */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative section-workflow">
-        <div className="wave-divider-top">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="wave-fill"/>
-          </svg>
-        </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeUp}
-            className="text-center mb-20"
-          >
-            <h2 className="text-4xl sm:text-6xl font-bold mb-6 section-title font-serif">
-              {t.workflow.title}
-            </h2>
-            <p className="text-2xl section-subtitle">{t.workflow.subtitle}</p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto"
-          >
-            {t.workflow.steps.map((step, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                className="glass-ultra p-8 rounded-2xl"
-              >
-                <div className="flex items-start space-x-4">
-                  <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center text-white font-bold text-lg">
-                    {i + 1}
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold mb-2 card-title">{step.title}</h3>
-                    <p className="card-description">{step.desc}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
-
-        <div className="wave-divider-bottom">
-          <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-            <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="wave-fill"/>
-          </svg>
-        </div>
-      </section>
-
-      {/* PRICING SECTION */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 relative section-pricing">
+      {/* PRICING */}
+      <section id="pricing" className="py-32 px-4 sm:px-6 lg:px-8 relative section-pricing">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.3 }}
             variants={fadeUp}
-            className="text-center mb-20"
+            className="text-center mb-16"
           >
-            <h2 className="text-4xl sm:text-6xl font-bold mb-6 section-title font-serif">
+            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 section-title font-serif">
               {t.offers.title}
             </h2>
-            <p className="text-2xl section-subtitle">{t.offers.subtitle}</p>
+            <p className="text-xl sm:text-2xl section-subtitle">{t.offers.subtitle}</p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
             variants={staggerContainer}
-            className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto"
+            className="grid md:grid-cols-2 gap-8 mb-12"
           >
             {/* Core System Card */}
-            <motion.div variants={fadeUp} className="pricing-card-light p-10 rounded-3xl relative">
-              <div className="absolute -top-4 -right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg rotate-12">
-                {t.offers.discount}
-              </div>
-              <div className="inline-block bg-blue-100 text-blue-600 px-4 py-2 rounded-full text-sm font-bold mb-6">
-                {t.offers.core.badge}
-              </div>
-              <h3 className="text-3xl font-bold mb-3 text-slate-900 font-serif">{t.offers.core.name}</h3>
-              <div className="mb-8">
-                <div className="text-2xl text-slate-400 line-through mb-2">{t.offers.core.originalPrice}</div>
-                <div className="text-5xl font-bold text-[#3b82f6]">{t.offers.core.price}</div>
-              </div>
-              <ul className="space-y-4 mb-10">
-                {t.offers.core.features.map((feature, i) => (
-                  <li key={i} className="flex items-center space-x-3 text-slate-700 font-semibold">
-                    <Check className="w-5 h-5 text-[#3b82f6] flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="#contact"
-                className="block w-full text-center bg-white border-2 border-[#3b82f6] text-[#3b82f6] font-bold py-4 rounded-full hover:bg-[#3b82f6] hover:text-white transition-all duration-300"
-              >
-                Get The Deal
-              </a>
-            </motion.div>
-
-            {/* Manager Pro Card - Dark with Gold accents */}
-            <motion.div variants={fadeUp} className="pricing-card-dark p-10 rounded-3xl relative">
-              <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white px-8 py-3 rounded-full text-sm font-bold shadow-lg z-10">
-                ⭐ POPULAR
-              </div>
-              <div className="absolute -top-4 -right-4 bg-red-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg rotate-12">
-                {t.offers.discount}
-              </div>
-              <div className="inline-block bg-yellow-500/20 text-yellow-400 px-4 py-2 rounded-full text-sm font-bold mb-6">
-                {t.offers.manager.badge}
-              </div>
-              <h3 className="text-3xl font-bold mb-3 text-white font-serif">{t.offers.manager.name}</h3>
-              <div className="mb-8">
-                <div className="text-2xl text-slate-400 line-through mb-2">{t.offers.manager.originalPrice}</div>
-                <div className="text-5xl font-bold gold-gradient-text">{t.offers.manager.price}</div>
-              </div>
-              <ul className="space-y-4 mb-10">
-                {t.offers.manager.features.map((feature, i) => (
-                  <li key={i} className="flex items-center space-x-3 text-white font-semibold">
-                    <Check className="w-5 h-5 text-[#f59e0b] flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href="#contact"
-                className="block w-full text-center bg-gradient-to-r from-[#f59e0b] to-[#d97706] text-white font-bold py-4 rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300"
-              >
-                Get The Deal
-              </a>
-            </motion.div>
-          </motion.div>
-
-          {/* View Workflow Button */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeUp}
-            className="text-center mt-12"
-          >
-            <button
-              onClick={() => setShowWorkflow(!showWorkflow)}
-              className="royal-button-secondary px-10 py-4 rounded-full inline-flex items-center space-x-3 text-lg"
+            <motion.div
+              variants={scaleIn}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="glass-ultra p-10 rounded-3xl relative overflow-hidden"
             >
-              <ArrowRight className={`w-6 h-6 transition-transform ${showWorkflow ? 'rotate-90' : ''}`} />
-              <span>{showWorkflow ? t.offers.hideWorkflow : t.offers.viewWorkflow}</span>
-            </button>
+              <div className="absolute top-6 right-6">
+                <span className="px-4 py-2 bg-blue-500 bg-opacity-20 text-blue-400 rounded-full text-sm font-bold border border-blue-500 border-opacity-30">
+                  {t.offers.discount}
+                </span>
+              </div>
+
+              <h3 className="text-3xl font-bold mb-4 card-title">{t.offers.core.name}</h3>
+              <p className="text-sm card-description mb-6">{t.offers.core.badge}</p>
+              
+              <div className="mb-8">
+                <span className="text-5xl font-black gold-gradient-text">{t.offers.core.price}</span>
+                <span className="text-2xl ml-3 line-through card-description">{t.offers.core.originalPrice}</span>
+              </div>
+
+              <div className="space-y-4">
+                {t.offers.core.features.map((feature, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-start space-x-3"
+                  >
+                    <Check className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                    <span className="card-description">{feature}</span>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Manager Pro Card */}
+            <motion.div
+              variants={scaleIn}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="glass-ultra-highlight p-10 rounded-3xl relative overflow-hidden"
+            >
+              <motion.div
+                className="absolute -top-20 -right-20 w-40 h-40 bg-blue-500 rounded-full filter blur-3xl opacity-30"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  opacity: [0.3, 0.5, 0.3],
+                }}
+                transition={{
+                  duration: 4,
+                  repeat: Infinity,
+                }}
+              />
+
+              <div className="absolute top-6 right-6">
+                <span className="px-4 py-2 bg-blue-500 text-white rounded-full text-sm font-bold shadow-lg">
+                  {t.offers.discount}
+                </span>
+              </div>
+
+              <h3 className="text-3xl font-bold mb-4 card-title">{t.offers.manager.name}</h3>
+              <p className="text-sm card-description mb-6">{t.offers.manager.badge}</p>
+              
+              <div className="mb-8">
+                <span className="text-5xl font-black gold-gradient-text">{t.offers.manager.price}</span>
+                <span className="text-2xl ml-3 line-through card-description">{t.offers.manager.originalPrice}</span>
+              </div>
+
+              <div className="space-y-4">
+                {t.offers.manager.features.map((feature, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 }}
+                    className="flex items-start space-x-3"
+                  >
+                    <Check className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                    <span className="card-description">{feature}</span>
+                  </motion.div>
+                ))}
+              </div>
+
+              <motion.button
+                onClick={() => setShowWorkflow(!showWorkflow)}
+                className="mt-8 w-full royal-button-primary px-6 py-4 rounded-full inline-flex items-center justify-center space-x-2"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <ArrowRight className="w-5 h-5" />
+                <span>{showWorkflow ? t.offers.hideWorkflow : t.offers.viewWorkflow}</span>
+              </motion.button>
+            </motion.div>
           </motion.div>
 
-          {/* Collapsible Workflow Section */}
+          {/* Workflow Section */}
           <AnimatePresence>
             {showWorkflow && (
               <motion.div
@@ -855,12 +938,17 @@ function App() {
                     <motion.div
                       key={i}
                       variants={fadeUp}
+                      whileHover={{ scale: 1.03 }}
                       className="glass-ultra p-8 rounded-2xl"
                     >
                       <div className="flex items-start space-x-4">
-                        <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center text-white font-bold text-lg">
+                        <motion.div
+                          className="flex-shrink-0 w-12 h-12 rounded-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center text-white font-bold text-lg"
+                          whileHover={{ rotate: 360 }}
+                          transition={{ duration: 0.6 }}
+                        >
                           {i + 1}
-                        </div>
+                        </motion.div>
                         <div>
                           <h4 className="text-xl font-bold mb-2 card-title">{step.title}</h4>
                           <p className="card-description">{step.desc}</p>
@@ -881,24 +969,28 @@ function App() {
             className="text-center mt-16"
           >
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a 
+              <motion.a 
                 href="https://app.supademo.com/demo/cml7rvvdt78zazsad49bgxgk4?utm_source=link"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="royal-button-primary px-8 py-4 rounded-full inline-flex items-center space-x-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <ExternalLink className="w-5 h-5" />
                 <span>Interactive Demo</span>
-              </a>
-              <a 
+              </motion.a>
+              <motion.a 
                 href="https://drive.google.com/file/d/1XH4D8R_o4HefhD1iUWZ4z-d_rez4km4e/view?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="royal-button-secondary px-8 py-4 rounded-full inline-flex items-center space-x-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <Download className="w-5 h-5" />
                 <span>Demo PDF</span>
-              </a>
+              </motion.a>
             </div>
           </motion.div>
         </div>
@@ -927,13 +1019,19 @@ function App() {
             {techStack.map((tech, i) => (
               <motion.div
                 key={i}
-                variants={fadeUp}
-                className="glass-ultra p-8 text-center rounded-2xl"
+                variants={scaleIn}
+                whileHover={{ 
+                  y: -8, 
+                  rotate: [0, -5, 5, 0],
+                  transition: { duration: 0.4 }
+                }}
+                className="glass-ultra p-8 text-center rounded-2xl cursor-pointer"
               >
-                <img 
+                <motion.img 
                   src={tech.logo} 
                   alt={tech.name}
                   className="w-16 h-16 mx-auto mb-4"
+                  whileHover={{ scale: 1.1 }}
                 />
                 <p className="card-title font-bold">{tech.name}</p>
               </motion.div>
@@ -942,56 +1040,145 @@ function App() {
         </div>
       </section>
 
+      {/* PORTFOLIO SECTION */}
+      <section id="portfolio" className="py-32 px-4 sm:px-6 lg:px-8 relative section-who-serve">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeUp}
+            className="text-center"
+          >
+            <motion.div
+              className="inline-flex items-center space-x-2 mb-6"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Briefcase className="w-8 h-8 text-[#3b82f6]" />
+              <h2 className="text-4xl sm:text-6xl lg:text-7xl font-bold section-title font-serif">
+                {t.footer.portfolio}
+              </h2>
+            </motion.div>
+            <p className="text-xl sm:text-2xl section-subtitle mb-12 max-w-3xl mx-auto">
+              {lang === 'en' 
+                ? 'Explore our complete collection of successful projects and client solutions' 
+                : 'Başarılı projelerimizin ve müşteri çözümlerimizin tam koleksiyonunu keşfedin'}
+            </p>
+            
+            <motion.a
+              href="https://appsheet-solutions.notion.site/portfolio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="royal-button-primary px-10 py-5 rounded-full inline-flex items-center space-x-3 text-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ExternalLink className="w-6 h-6" />
+              <span>{lang === 'en' ? 'View Portfolio' : 'Portföyü Görüntüle'}</span>
+            </motion.a>
+          </motion.div>
+        </div>
+      </section>
+
       {/* FOOTER */}
       <footer id="contact" className="py-20 px-4 sm:px-6 lg:px-8 relative section-footer">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-12 mb-12">
+          <div className="grid md:grid-cols-3 gap-12 mb-12">
             {/* Brand Column */}
             <div>
-              <div className="flex items-center space-x-3 mb-6">
+              <motion.div 
+                className="flex items-center space-x-3 mb-6"
+                whileHover={{ scale: 1.05 }}
+              >
                 <Anchor className="w-8 h-8 text-[#3b82f6] vivid-icon vivid-icon-blue" />
                 <h4 className="text-2xl font-bold footer-brand font-serif">{t.footer.brand}</h4>
-              </div>
+              </motion.div>
               <p className="footer-text mb-8 leading-relaxed">{t.footer.tagline}</p>
-              
-              {/* Social Media Icons */}
-              <div className="flex items-center space-x-4">
-                <a href="#" className="social-icon p-2 rounded-lg hover:bg-[#3b82f6] hover:bg-opacity-20 transition">
-                  <Twitter className="w-5 h-5" />
-                </a>
-                <a href="#" className="social-icon p-2 rounded-lg hover:bg-[#3b82f6] hover:bg-opacity-20 transition">
-                  <Linkedin className="w-5 h-5" />
-                </a>
-                <a href="#" className="social-icon p-2 rounded-lg hover:bg-[#3b82f6] hover:bg-opacity-20 transition">
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a href="#" className="social-icon p-2 rounded-lg hover:bg-[#3b82f6] hover:bg-opacity-20 transition">
-                  <Facebook className="w-5 h-5" />
-                </a>
+            </div>
+
+            {/* Quick Links Column */}
+            <div>
+              <h4 className="footer-column-title mb-6">{t.footer.quickLinks}</h4>
+              <div className="space-y-4">
+                <motion.a 
+                  href="https://appsheet-solutions.notion.site/portfolio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-3 footer-contact group"
+                  whileHover={{ x: 4 }}
+                >
+                  <Briefcase className="w-5 h-5 group-hover:text-[#3b82f6] transition" />
+                  <span>{t.footer.portfolio}</span>
+                </motion.a>
+                <motion.a 
+                  href="https://earnest-conkies-7a833f.netlify.app/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center space-x-3 footer-contact group"
+                  whileHover={{ x: 4 }}
+                >
+                  <Globe className="w-5 h-5 group-hover:text-[#3b82f6] transition" />
+                  <span>{t.footer.website}</span>
+                </motion.a>
               </div>
             </div>
 
             {/* Contact Column */}
             <div>
               <h4 className="footer-column-title mb-6">{t.footer.contact.title}</h4>
-              <div className="space-y-4">
-                <a href={`mailto:${t.footer.email}`} className="flex items-center space-x-3 footer-contact">
+              <div className="space-y-4 mb-6">
+                <motion.a 
+                  href={`mailto:${t.footer.email}`} 
+                  className="flex items-center space-x-3 footer-contact"
+                  whileHover={{ x: 4 }}
+                >
                   <Mail className="w-5 h-5" />
-                  <span>{t.footer.email}</span>
-                </a>
-                <a href={`tel:${t.footer.phone}`} className="flex items-center space-x-3 footer-contact">
+                  <span className="text-sm break-all">{t.footer.email}</span>
+                </motion.a>
+                <motion.a 
+                  href={`tel:${t.footer.phone}`} 
+                  className="flex items-center space-x-3 footer-contact"
+                  whileHover={{ x: 4 }}
+                >
                   <PhoneIcon className="w-5 h-5" />
                   <span>{t.footer.phone}</span>
-                </a>
-                <a 
+                </motion.a>
+                <motion.a 
                   href={`https://wa.me/${t.footer.whatsapp.replace(/[^0-9]/g, '')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center space-x-3 text-[#25D366] hover:underline transition"
+                  whileHover={{ x: 4 }}
                 >
                   <MessageCircle className="w-5 h-5" />
                   <span>{t.footer.whatsapp}</span>
-                </a>
+                </motion.a>
+              </div>
+
+              {/* Social Media */}
+              <h4 className="footer-column-title mb-4 text-sm">{t.footer.social}</h4>
+              <div className="flex items-center space-x-4">
+                <motion.a 
+                  href="https://linkedin.com/company/appsheetsolutions" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-icon p-2 rounded-lg hover:bg-[#3b82f6] hover:bg-opacity-20 transition"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.9 }}
+                >
+                  <Linkedin className="w-5 h-5" />
+                </motion.a>
+                <motion.div 
+                  className="relative group"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                >
+                  <div className="social-icon p-2 rounded-lg opacity-40 cursor-not-allowed">
+                    <Instagram className="w-5 h-5" />
+                  </div>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+                    {t.footer.instagramComing}
+                  </div>
+                </motion.div>
               </div>
             </div>
           </div>

@@ -13,6 +13,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -197,7 +201,7 @@ body {
   backdrop-filter: blur(20px);
   border: 1px solid rgba(15, 23, 42, 0.08);
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .theme-light .who-serve-card:hover {
@@ -244,11 +248,12 @@ body {
 
 .footer-link:hover {
   color: #3b82f6;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .footer-contact {
   color: var(--color-text-muted);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .footer-contact:hover {
@@ -257,6 +262,7 @@ body {
 
 .social-icon {
   color: var(--color-text-muted);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ========================================
@@ -307,7 +313,7 @@ body {
 .vivid-icon {
   filter: drop-shadow(0 4px 12px currentColor) 
           drop-shadow(0 8px 24px currentColor);
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .vivid-icon:hover {
@@ -339,45 +345,37 @@ body {
   background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
   border: 2px solid #e2e8f0;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pricing-card-light:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.12);
-  border-color: #3b82f6;
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.12);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 .pricing-card-dark {
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 2px solid rgba(245, 158, 11, 0.3);
-  box-shadow: 
-    0 25px 80px rgba(245, 158, 11, 0.2),
-    inset 0 2px 10px rgba(255, 255, 255, 0.05);
-  transition: all 0.4s ease;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pricing-card-dark:hover {
-  transform: translateY(-8px);
-  box-shadow: 
-    0 35px 100px rgba(245, 158, 11, 0.3),
-    inset 0 2px 10px rgba(255, 255, 255, 0.08);
-  border-color: rgba(245, 158, 11, 0.5);
+  transform: translateY(-12px) scale(1.02);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.7);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 /* ========================================
-   GLASS ULTRA (Premium Cards)
+   GLASSMORPHISM CARDS
    ======================================== */
-.glass-ultra {
-  background: var(--color-card-bg);
+.theme-dark .glass-ultra {
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(32px) saturate(180%);
-  -webkit-backdrop-filter: blur(32px) saturate(180%);
-  border-radius: 32px;
-  border: 1px solid var(--color-card-border);
-  box-shadow: 
-    0 20px 70px rgba(0, 0, 0, 0.6),
-    inset 0 2px 8px rgba(255, 255, 255, 0.05);
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.6);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-ultra:hover {
@@ -404,7 +402,7 @@ body {
   backdrop-filter: blur(32px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 70px rgba(0, 0, 0, 0.6);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .theme-dark .who-serve-card:hover {
@@ -426,7 +424,7 @@ body {
   padding: 16px 32px;
   border-radius: 16px;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 2px solid transparent;
 }
 
@@ -462,6 +460,14 @@ body {
     inset 0 1px 2px rgba(255, 255, 255, 0.1);
   border: 3px solid #1e293b;
   margin: 0 auto;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.iphone-frame:hover {
+  transform: scale(1.02);
+  box-shadow: 
+    0 50px 140px rgba(0, 0, 0, 0.95),
+    inset 0 1px 2px rgba(255, 255, 255, 0.15);
 }
 
 .iphone-notch {
@@ -519,6 +525,14 @@ body {
     0 30px 100px rgba(59, 130, 246, 0.4),
     inset 0 2px 8px rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(59, 130, 246, 0.3);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.video-container:hover {
+  box-shadow: 
+    0 40px 120px rgba(59, 130, 246, 0.5),
+    inset 0 2px 10px rgba(255, 255, 255, 0.15);
+  transform: scale(1.01);
 }
 
 /* ========================================
@@ -529,7 +543,7 @@ body {
   backdrop-filter: blur(28px);
   border-bottom: 2px solid rgba(59, 130, 246, 0.2);
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.8);
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .mobile-menu {
@@ -550,7 +564,7 @@ body {
 
 .toggle-button {
   border-radius: 50px;
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 600;
   padding: 10px 24px;
 }
@@ -598,7 +612,24 @@ body {
   box-shadow: 
     0 12px 36px rgba(59, 130, 246, 0.45),
     inset 0 2px 4px rgba(255, 255, 255, 0.3);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.royal-button-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.royal-button-primary:hover::before {
+  left: 100%;
 }
 
 .royal-button-primary:hover {
@@ -614,7 +645,24 @@ body {
   color: #3b82f6;
   font-weight: 700;
   backdrop-filter: blur(8px);
-  transition: all 0.4s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.royal-button-secondary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(59, 130, 246, 0.1);
+  transition: left 0.5s;
+}
+
+.royal-button-secondary:hover::before {
+  left: 100%;
 }
 
 .royal-button-secondary:hover {
@@ -642,7 +690,7 @@ body {
   display: block;
   color: var(--color-text-muted);
   margin-bottom: 0.75rem;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-size: 0.95rem;
 }
 
@@ -670,6 +718,7 @@ body {
   background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
   border-radius: 10px;
   border: 3px solid #020617;
+  transition: background 0.3s;
 }
 
 .theme-light ::-webkit-scrollbar-thumb {
@@ -685,11 +734,56 @@ body {
    ======================================== */
 .glass-ultra,
 .glass-ultra-highlight,
-.who-serve-card {
+.who-serve-card,
+.royal-button-primary,
+.royal-button-secondary {
   transform: translateZ(0);
   backface-visibility: hidden;
   perspective: 1000px;
   will-change: transform;
+}
+
+/* ========================================
+   MICRO INTERACTIONS
+   ======================================== */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.6);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* ========================================
+   SCROLL REVEAL ANIMATION
+   ======================================== */
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ========================================
@@ -719,4 +813,24 @@ body {
   .section-title {
     font-size: 1.75rem;
   }
+}
+
+/* ========================================
+   SELECTION STYLING
+   ======================================== */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: #ffffff;
+}
+
+/* ========================================
+   SMOOTH TRANSITIONS
+   ======================================== */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
